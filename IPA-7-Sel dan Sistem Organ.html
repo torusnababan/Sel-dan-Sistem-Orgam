@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kuis IPA SMP Sel dan Sistem Organ</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+    input[type="text"] {
+      width: 300px;
+      margin-bottom: 10px;
+      display: block;
+    }
+    #timer {
+      font-weight: bold;
+      color: red;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Kuis IPA SMP</h2>
+  <h2>By: Torus Manuntun Nababan, M.Pd</h2>
+  <h2>Materi: Sel dan Sistem Organ</h2>
+  <!-- Form Identitas -->
+  <div id="identityForm">
+    <h3>Silakan isi identitas terlebih dahulu:</h3>
+    <label>Nama:
+      <input type="text" id="nama" required>
+    </label>
+    <label>Kelas:
+      <input type="text" id="kelas" required>
+    </label>
+    <label>Tahun Ajaran:
+      <input type="text" id="tahun" required>
+    </label>
+    <label>Nama Sekolah:
+      <input type="text" id="sekolah" required>
+    </label>
+    <button onclick="startQuiz()">Mulai Kuis</button>
+  </div>
+
+  <!-- Timer -->
+  <div id="timer" class="hidden"></div>
+
+  <!-- Form Soal -->
+  <form id="quizForm" class="hidden">
+    <div id="questionsContainer"></div>
+    <button type="button" onclick="submitQuiz()">Selesai dan Lihat Skor</button>
+  </form>
+
+  <div id="result" class="hidden"></div>
+
+  <script>
+    const questions = [
+      { question: "1. Unit struktural dan fungsional terkecil dari makhluk hidup adalah...", options: ["Organ", "Jaringan", "Sel", "Sistem organ"], answer: "Sel" },
+    { question: "2. Organel sel yang berfungsi sebagai pusat pengendali sel adalah...", options: ["Mitokondria", "Nukleus", "Ribosom", "Lisosom"], answer: "Nukleus" },
+    { question: "3. Organel yang hanya dimiliki oleh sel tumbuhan dan berfungsi untuk fotosintesis adalah...", options: ["Mitokondria", "Kloroplas", "Nukleus", "Retikulum Endoplasma"], answer: "Kloroplas" },
+    { question: "4. Dinding sel hanya dimiliki oleh...", options: ["Sel hewan", "Sel tumbuhan", "Sel manusia", "Sel darah"], answer: "Sel tumbuhan" },
+    { question: "5. Organel yang menghasilkan energi dalam sel disebut...", options: ["Lisosom", "Kloroplas", "Mitokondria", "Nukleus"], answer: "Mitokondria" },
+    { question: "6. Jaringan adalah...", options: ["Gabungan dari sel-sel yang sama dan memiliki fungsi khusus", "Gabungan dari beberapa organ", "Kumpulan organel", "Gabungan dari sistem organ"], answer: "Gabungan dari sel-sel yang sama dan memiliki fungsi khusus" },
+    { question: "7. Contoh jaringan pada tumbuhan adalah...", options: ["Jaringan otot", "Jaringan saraf", "Jaringan floem", "Jaringan epitel"], answer: "Jaringan floem" },
+    { question: "8. Sistem organ adalah...", options: ["Kumpulan jaringan yang bekerja sama", "Kumpulan sel yang bekerja sendiri", "Gabungan dari beberapa jaringan", "Gabungan organ yang bekerja sama melakukan fungsi tertentu"], answer: "Gabungan organ yang bekerja sama melakukan fungsi tertentu" },
+    { question: "9. Organ pernapasan pada manusia adalah...", options: ["Lambung", "Paru-paru", "Usus", "Hati"], answer: "Paru-paru" },
+    { question: "10. Sistem organ yang berfungsi mengangkut oksigen dan sari makanan adalah...", options: ["Sistem pencernaan", "Sistem pernapasan", "Sistem peredaran darah", "Sistem saraf"], answer: "Sistem peredaran darah" },
+    { question: "11. Organ utama dalam sistem pencernaan adalah...", options: ["Jantung", "Paru-paru", "Lambung", "Ginjal"], answer: "Lambung" },
+    { question: "12. Sistem ekskresi bertugas untuk...", options: ["Mengangkut oksigen", "Menyerap sari makanan", "Membuang zat sisa metabolisme", "Mendeteksi rangsangan"], answer: "Membuang zat sisa metabolisme" },
+    { question: "13. Ginjal termasuk organ dalam sistem...", options: ["Pencernaan", "Pernapasan", "Ekskresi", "Reproduksi"], answer: "Ekskresi" },
+    { question: "14. Sistem saraf berfungsi untuk...", options: ["Mengatur hormon", "Menyaring darah", "Mengangkut sari makanan", "Menerima dan menanggapi rangsang"], answer: "Menerima dan menanggapi rangsang" },
+    { question: "15. Alat peredaran darah manusia yang memompa darah adalah...", options: ["Hati", "Jantung", "Lambung", "Ginjal"], answer: "Jantung" },
+    { question: "16. Organ reproduksi pada pria adalah...", options: ["Ovarium", "Vagina", "Testis", "Uterus"], answer: "Testis" },
+    { question: "17. Fungsi utama sistem pencernaan adalah...", options: ["Mengolah makanan menjadi energi", "Mengalirkan darah", "Menangkap rangsangan", "Membuang kotoran"], answer: "Mengolah makanan menjadi energi" },
+    { question: "18. Sistem organ yang bertugas mengeluarkan karbon dioksida adalah...", options: ["Peredaran darah", "Ekskresi", "Pernapasan", "Pencernaan"], answer: "Pernapasan" },
+    { question: "19. Hubungan yang benar antara sel - jaringan - organ - sistem organ adalah...", options: ["Jaringan membentuk sel", "Sistem organ membentuk organ", "Sel membentuk jaringan", "Organ membentuk sel"], answer: "Sel membentuk jaringan" },
+    { question: "20. Jaringan pada manusia yang berfungsi menghubungkan otot dengan tulang disebut...", options: ["Tendon", "Ligamen", "Saraf", "Daging"], answer: "Tendon" }
+  ];
+
+    let quizTimer;
+    let countdownInterval;
+    const timeLimit = 20 * 60 * 1000; // 20 menit
+
+    function startQuiz() {
+      const nama = document.getElementById('nama').value;
+      const kelas = document.getElementById('kelas').value;
+      const tahun = document.getElementById('tahun').value;
+      const sekolah = document.getElementById('sekolah').value;
+
+      if (!nama || !kelas || !tahun || !sekolah) {
+        alert("Harap lengkapi semua data identitas.");
+        return;
+      }
+
+      document.getElementById('identityForm').classList.add('hidden');
+      document.getElementById('quizForm').classList.remove('hidden');
+      document.getElementById('timer').classList.remove('hidden');
+
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = "";
+      questions.forEach((q, index) => {
+        const div = document.createElement('div');
+        div.classList.add('question');
+        div.innerHTML = `<p>${q.question}</p>` + q.options.map(opt => `
+          <label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label><br>`).join('');
+        container.appendChild(div);
+      });
+
+      // Timer otomatis submit setelah 20 menit
+      quizTimer = setTimeout(() => {
+        alert("Waktu habis! Kuis akan otomatis disubmit.");
+        submitQuiz();
+      }, timeLimit);
+
+      // Countdown display
+      let remaining = timeLimit / 1000;
+      const timerDisplay = document.getElementById('timer');
+      timerDisplay.textContent = `Sisa waktu: ${remaining} detik`;
+      countdownInterval = setInterval(() => {
+        remaining--;
+        timerDisplay.textContent = `Sisa waktu: ${remaining} detik`;
+        if (remaining <= 0) {
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+    }
+
+    function submitQuiz() {
+      clearTimeout(quizTimer);
+      clearInterval(countdownInterval);
+
+      let score = 0;
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected && selected.value === q.answer) {
+          score += 10;
+        }
+      });
+
+      document.getElementById('quizForm').classList.add('hidden');
+      document.getElementById('timer').classList.add('hidden');
+      const resultDiv = document.getElementById('result');
+      resultDiv.classList.remove('hidden');
+
+      const nama = document.getElementById('nama').value;
+      const kelas = document.getElementById('kelas').value;
+      const tahun = document.getElementById('tahun').value;
+      const sekolah = document.getElementById('sekolah').value;
+
+      let message = "";
+      if (score >= 70) {
+        message = "<p style='color: green;'><strong>Selamat!</strong> Anda Sudah Bisa Melanjutkan ke Materi Berikutnya.</p>";
+      } else {
+        message = "<p style='color: red;'><strong>Mohon maaf.</strong> Silakan pelajari kembali materi ini sebelum melanjutkan ke materi berikutnya.</p>";
+      }
+
+      resultDiv.innerHTML = `
+        <h3>Hasil Kuis</h3>
+        <p><strong>Nama:</strong> ${nama}</p>
+        <p><strong>Kelas:</strong> ${kelas}</p>
+        <p><strong>Tahun Ajaran:</strong> ${tahun}</p>
+        <p><strong>Sekolah:</strong> ${sekolah}</p>
+        <p><strong>Skor Anda:</strong> ${score} dari 200</p>
+        ${message}
+      `;
+    }
+  </script>
+</body>
+</html>
